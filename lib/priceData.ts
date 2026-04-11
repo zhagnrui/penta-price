@@ -1,256 +1,71 @@
-export type SeasonType = "single" | "double" | "international";
+// ─────────────────────────────────────────────────────
+// 每周更新说明：
+// 只需修改 currentWeek 对象中的数据
+// history12w: 删除第一个数字，末尾加本周均价
+// historyLabels: 同步更新周次标签
+// ─────────────────────────────────────────────────────
 
-export interface PriceItem {
-  id: string;
-  model: string;
-  spec: string;
-  capacity: string;
-  weight: string;
-  material: string;
-  moq: number;
-  priceRanges: {
-    qty: string;
-    price: number;
-    currency: string;
-  }[];
-  features: string[];
-  inStock: boolean;
+export const currentWeek = {
+  weekLabel: 'Week 15, 2026',
+  updatedAt: '2026-04-10',
+
+  mono: {
+    domesticAvg: 11850,
+    weekChange: 0,
+    grade95: { low: 10000, high: 10500 },
+    grade98: { low: 13500, high: 14000 },
+    fobQingdao: 1520,
+    regions: [
+      { name: '华东 95%',    price: '10,000–10,400', trend: 'down' as const },
+      { name: '华南 95%',    price: '10,200–10,600', trend: 'flat' as const },
+      { name: '华北 98%',    price: '13,500–14,000', trend: 'up'   as const },
+      { name: '内蒙出厂 98%', price: '13,200–13,800', trend: 'flat' as const },
+      { name: 'FOB 青岛',    price: '$1,480–1,560',  trend: 'down' as const },
+    ],
+    news: [
+      { text: '湖北宜化宜昌装置升级改造进入关键阶段，供给端关注度持续升温', tag: '供给', date: '2026-04-10' },
+      { text: '甲醛原料价格本周小幅回落，对单季成本端形成短期压力', tag: '成本', date: '2026-04-10' },
+      { text: '涂料下游春季开工率回升至78%，补库需求温和，价格承压但支撑稳固', tag: '需求', date: '2026-04-10' },
+    ],
+    history12w: [11200, 11400, 11100, 11600, 11800, 11500, 11900, 12100, 11850, 11700, 11900, 11850],
+    historyLabels: ['W4','W5','W6','W7','W8','W9','W10','W11','W12','W13','W14','W15'],
+  },
+
+  di: {
+    marketAvg: 62000,
+    highEnd: 68000,
+    fob: 8400,
+    vsOct2024Pct: 175,
+    supply: 1.8,
+    demand: 2.5,
+    history18m: [25000,28000,32000,35000,42000,55000,60000,62000,58000,61000,65000,63000,60000,64000,68000,66000,62000,62000],
+    historyLabels: ['2024-10','11','12','2025-01','02','03','04','05','06','07','08','09','10','11','12','2026-01','02','03'],
+    news: [
+      { text: '双季供需缺口持续，PCB光固化油墨需求驱动高端报价持续支撑', tag: 'PCB需求', date: '2026-04-10' },
+      { text: '湖北宜化内蒙新装置预计2025年底投产，届时双季产能有望增加', tag: '供给', date: '2026-04-10' },
+    ],
+  },
+
+  intl: {
+    us: 2090,
+    europe: 2170,
+    chinafob: 1520,
+    sea: 1570,
+    usChange: 22,
+    euChange: 16,
+    cnChange: -6,
+    seaChange: -2,
+    news: [
+      { text: 'US market surged 22% MoM in March 2025, driven by tight supply amid Perstorp maintenance and tariff-driven front-loading.', tag: 'North America', date: '2026-04-10' },
+      { text: '欧洲市场受德国汽车涂料需求支撑，德国报价连续两月上行，Q2预计维持高位震荡', tag: 'Europe', date: '2026-04-10' },
+      { text: 'China FOB prices under pressure from oversupply; export competitiveness vs Russian suppliers remains challenged in European markets', tag: 'Asia export', date: '2026-04-10' },
+    ],
+    history: {
+      labels: ['Q1 23','Q2 23','Q3 23','Q4 23','Q1 24','Q2 24','Q3 24','Q4 24','Q1 25','Q3 25','Q1 26'],
+      us:  [1800,1750,2160,1900,1800,1850,2160,1900,2090,2090,2090],
+      eu:  [1700,1650,1945,1800,1700,1700,1945,1820,2170,2000,2170],
+      cn:  [1500,1450,1447,1400,1380,1530,1447,1380,1620,1500,1520],
+      sea: [1450,1380,1400,1350,1320,1470,1400,1370,1570,1520,1570],
+    },
+  },
 }
-
-export interface SeasonCategory {
-  key: SeasonType;
-  label: string;
-  description: string;
-  items: PriceItem[];
-}
-
-export const priceData: SeasonCategory[] = [
-  {
-    key: "single",
-    label: "单季帐篷",
-    description: "适用于春夏季节，轻量透气，适合徒步露营",
-    items: [
-      {
-        id: "s-001",
-        model: "PentaTrek 1P",
-        spec: "210×90×110 cm",
-        capacity: "1人",
-        weight: "1.2 kg",
-        material: "20D 尼龙 + 铝合金帐杆",
-        moq: 50,
-        priceRanges: [
-          { qty: "50–99", price: 28, currency: "USD" },
-          { qty: "100–299", price: 24, currency: "USD" },
-          { qty: "300+", price: 20, currency: "USD" },
-        ],
-        features: ["防泼水 2000mm", "通风侧窗", "轻量脚垫", "收纳袋附带"],
-        inStock: true,
-      },
-      {
-        id: "s-002",
-        model: "PentaTrek 2P",
-        spec: "210×130×115 cm",
-        capacity: "2人",
-        weight: "1.8 kg",
-        material: "20D 尼龙 + 铝合金帐杆",
-        moq: 50,
-        priceRanges: [
-          { qty: "50–99", price: 38, currency: "USD" },
-          { qty: "100–299", price: 32, currency: "USD" },
-          { qty: "300+", price: 27, currency: "USD" },
-        ],
-        features: ["防泼水 2000mm", "双门双前庭", "快速搭建", "内置收纳袋"],
-        inStock: true,
-      },
-      {
-        id: "s-003",
-        model: "PentaShade 3P",
-        spec: "300×180×125 cm",
-        capacity: "3人",
-        weight: "2.6 kg",
-        material: "30D 涤纶 + 玻纤帐杆",
-        moq: 30,
-        priceRanges: [
-          { qty: "30–99", price: 45, currency: "USD" },
-          { qty: "100–299", price: 38, currency: "USD" },
-          { qty: "300+", price: 32, currency: "USD" },
-        ],
-        features: ["遮阳涂层", "超宽前庭", "地钉×12", "维修套件"],
-        inStock: true,
-      },
-      {
-        id: "s-004",
-        model: "PentaUL Solo",
-        spec: "200×80×95 cm",
-        capacity: "1人",
-        weight: "0.85 kg",
-        material: "15D 硅尼龙 + 碳纤杆",
-        moq: 100,
-        priceRanges: [
-          { qty: "100–199", price: 55, currency: "USD" },
-          { qty: "200–499", price: 46, currency: "USD" },
-          { qty: "500+", price: 39, currency: "USD" },
-        ],
-        features: ["超轻量级", "一体式单杆", "高强碳纤维", "压缩收纳"],
-        inStock: false,
-      },
-    ],
-  },
-  {
-    key: "double",
-    label: "双季帐篷",
-    description: "四季通用，加厚防风防雨，高海拔远征首选",
-    items: [
-      {
-        id: "d-001",
-        model: "PentaStorm 2P",
-        spec: "215×135×120 cm",
-        capacity: "2人",
-        weight: "2.9 kg",
-        material: "40D 尼龙 + 7001 铝合金杆",
-        moq: 30,
-        priceRanges: [
-          { qty: "30–99", price: 72, currency: "USD" },
-          { qty: "100–299", price: 60, currency: "USD" },
-          { qty: "300+", price: 50, currency: "USD" },
-        ],
-        features: ["防水 3000mm", "双层结构", "抗风 60km/h", "雪裙设计"],
-        inStock: true,
-      },
-      {
-        id: "d-002",
-        model: "PentaStorm 3P",
-        spec: "310×190×130 cm",
-        capacity: "3人",
-        weight: "3.8 kg",
-        material: "40D 尼龙 + 7001 铝合金杆",
-        moq: 30,
-        priceRanges: [
-          { qty: "30–99", price: 95, currency: "USD" },
-          { qty: "100–299", price: 80, currency: "USD" },
-          { qty: "300+", price: 68, currency: "USD" },
-        ],
-        features: ["防水 3000mm", "独立前庭", "交叉帐杆加固", "内帐可拆"],
-        inStock: true,
-      },
-      {
-        id: "d-003",
-        model: "PentaAlpine 2P",
-        spec: "220×130×105 cm",
-        capacity: "2人",
-        weight: "2.4 kg",
-        material: "30D 硅尼龙 + DAC 铝合金杆",
-        moq: 50,
-        priceRanges: [
-          { qty: "50–99", price: 118, currency: "USD" },
-          { qty: "100–299", price: 98, currency: "USD" },
-          { qty: "300+", price: 82, currency: "USD" },
-        ],
-        features: ["DAC 弯杆系统", "抗风 80km/h", "防水 4000mm", "雪裙+冰锥"],
-        inStock: true,
-      },
-      {
-        id: "d-004",
-        model: "PentaBase Camp 4P",
-        spec: "380×230×175 cm",
-        capacity: "4人",
-        weight: "6.2 kg",
-        material: "50D 涤纶 + 7001 铝合金杆",
-        moq: 20,
-        priceRanges: [
-          { qty: "20–49", price: 155, currency: "USD" },
-          { qty: "50–149", price: 130, currency: "USD" },
-          { qty: "150+", price: 110, currency: "USD" },
-        ],
-        features: ["大型前庭", "360° 通风", "抗压加固顶部", "营地级稳固性"],
-        inStock: true,
-      },
-    ],
-  },
-  {
-    key: "international",
-    label: "国际出口",
-    description: "符合欧美认证标准，含CE / REACH / CA65，支持OEM贴牌",
-    items: [
-      {
-        id: "i-001",
-        model: "PentaEU Hike 1P",
-        spec: "210×90×110 cm",
-        capacity: "1 Person",
-        weight: "1.25 kg",
-        material: "20D Nylon + Alu Poles",
-        moq: 100,
-        priceRanges: [
-          { qty: "100–299", price: 32, currency: "USD" },
-          { qty: "300–999", price: 27, currency: "USD" },
-          { qty: "1000+", price: 22, currency: "USD" },
-        ],
-        features: ["CE Certified", "REACH Compliant", "OEM/ODM Available", "Custom Packaging"],
-        inStock: true,
-      },
-      {
-        id: "i-002",
-        model: "PentaEU Hike 2P",
-        spec: "210×130×115 cm",
-        capacity: "2 Persons",
-        weight: "1.85 kg",
-        material: "20D Nylon + Alu Poles",
-        moq: 100,
-        priceRanges: [
-          { qty: "100–299", price: 42, currency: "USD" },
-          { qty: "300–999", price: 35, currency: "USD" },
-          { qty: "1000+", price: 29, currency: "USD" },
-        ],
-        features: ["CE Certified", "REACH Compliant", "OEM/ODM Available", "Retail-Ready Box"],
-        inStock: true,
-      },
-      {
-        id: "i-003",
-        model: "PentaUS Trail 2P",
-        spec: "215×130×118 cm",
-        capacity: "2 Persons",
-        weight: "1.95 kg",
-        material: "30D Nylon + Alu Poles",
-        moq: 100,
-        priceRanges: [
-          { qty: "100–299", price: 48, currency: "USD" },
-          { qty: "300–999", price: 40, currency: "USD" },
-          { qty: "1000+", price: 33, currency: "USD" },
-        ],
-        features: ["CPSC / CA65 Compliant", "UPF 50+ Canopy", "OEM/ODM Available", "Amazon FBA Ready"],
-        inStock: true,
-      },
-      {
-        id: "i-004",
-        model: "PentaUS Storm 3P",
-        spec: "300×185×128 cm",
-        capacity: "3 Persons",
-        weight: "3.1 kg",
-        material: "40D Nylon + DAC Poles",
-        moq: 50,
-        priceRanges: [
-          { qty: "50–149", price: 88, currency: "USD" },
-          { qty: "150–499", price: 74, currency: "USD" },
-          { qty: "500+", price: 62, currency: "USD" },
-        ],
-        features: ["CPSC / CA65 Compliant", "3000mm Waterproof", "OEM/ODM Available", "REI / MEC Supplier"],
-        inStock: false,
-      },
-      {
-        id: "i-005",
-        model: "PentaOEM Custom",
-        spec: "定制规格",
-        capacity: "定制",
-        weight: "定制",
-        material: "可选面料与帐杆",
-        moq: 200,
-        priceRanges: [
-          { qty: "200–499", price: 0, currency: "USD" },
-          { qty: "500+", price: 0, currency: "USD" },
-        ],
-        features: ["完全定制规格", "自有品牌贴标", "独立包装设计", "专属打样服务"],
-        inStock: true,
-      },
-    ],
-  },
-];

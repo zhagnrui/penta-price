@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 样式覆盖文件 — 替换说明
 
-## Getting Started
+## 文件对应关系
 
-First, run the development server:
+| 本包文件 | 替换到项目中的位置 |
+|---------|-----------------|
+| app/globals.css | penta-price/app/globals.css |
+| app/layout.tsx | penta-price/app/layout.tsx |
+| app/page.tsx | penta-price/app/page.tsx |
+| components/PriceDashboard.tsx | penta-price/components/PriceDashboard.tsx |
+| lib/priceData.ts | penta-price/lib/priceData.ts |
+
+## 操作步骤
 
 ```bash
+# 1. 进入你的项目目录
+cd penta-price
+
+# 2. 替换文件（把下载的文件拖进对应位置覆盖）
+
+# 3. 确认 Chart.js 已安装
+npm install react-chartjs-2 chart.js
+
+# 4. 重启开发服务器
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 每周更新数据
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+只需修改 `lib/priceData.ts` 里的 `currentWeek` 对象：
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. `weekLabel` 改为本周标识，如 `'Week 16, 2026'`
+2. `updatedAt` 改为本周日期
+3. `mono.domesticAvg` 等价格字段更新
+4. `mono.history12w` — 删除第一个数字，末尾加本周均价
+5. `mono.historyLabels` — 同步更新最后一个周次标签
+6. `news` 数组更新本周快评
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+提交一行命令自动部署：
+```bash
+git add lib/priceData.ts && git commit -m "price: week 16" && git push
+```
