@@ -328,19 +328,32 @@ html, body {
   overflow: hidden;
 }
 .pe-news-item {
-  padding: 12px 16px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--pe-border-light);
   display: flex;
   gap: 12px;
   align-items: flex-start;
-  text-decoration: none;
-  color: inherit;
 }
 .pe-news-item:last-child { border-bottom: none; }
-.pe-news-item:hover { background: var(--pe-surface); }
-.pe-news-item-link { cursor: pointer; }
-.pe-news-item-link:hover { background: var(--pe-green-light); }
-.pe-news-item-link:hover .pe-news-text { color: var(--pe-green-dark); }
+
+/* 标题行：可点击收起/展开 */
+.pe-news-head {
+  all: unset;
+  display: block;
+  cursor: pointer;
+  position: relative;
+  padding-right: 20px;
+  width: 100%;
+}
+.pe-news-head:disabled { cursor: default; }
+.pe-news-head:not(:disabled):hover .pe-news-text { color: var(--pe-green-dark); }
+.pe-news-toggle {
+  position: absolute;
+  right: 0;
+  top: 2px;
+  color: var(--pe-text-hint);
+  font-size: 11px;
+}
 .pe-news-dot {
   width: 7px;
   height: 7px;
@@ -367,10 +380,46 @@ html, body {
 .pe-news-source {
   color: var(--pe-text-hint);
 }
-.pe-news-link-hint {
+.pe-news-link {
   color: var(--pe-green);
   font-weight: 600;
   margin-left: auto;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.pe-news-link:hover {
+  text-decoration: underline;
+  color: var(--pe-green-dark);
+}
+.pe-news-link-placeholder {
+  color: var(--pe-text-hint);
+  opacity: 0.6;
+  margin-left: auto;
+  font-style: italic;
+}
+
+/* 正文段落（展开后显示） */
+.pe-news-detail {
+  margin: 6px 0 8px;
+  padding: 10px 12px;
+  background: var(--pe-surface);
+  border-left: 3px solid var(--pe-green-mid);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+.pe-news-body-text {
+  font-size: 12.5px;
+  color: var(--pe-text);
+  line-height: 1.7;
+  margin: 0;
+}
+.pe-news-body-text-en {
+  font-size: 11.5px;
+  color: var(--pe-text-muted);
+  line-height: 1.65;
+  margin: 6px 0 0;
+  padding-top: 6px;
+  border-top: 1px dashed var(--pe-border);
+  font-style: italic;
 }
 .pe-news-meta {
   font-size: 11px;

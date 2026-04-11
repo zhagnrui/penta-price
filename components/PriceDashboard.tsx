@@ -47,43 +47,80 @@ function MetricCard({ labelCn, labelEn, value, change }: MetricCardProps) {
   )
 }
 
-// 新闻条目：有 url 就渲染为 <a>，无 url 就渲染为静态块
+// 新闻条目：标题 + 正文段落（可展开/收起）+ 元信息 + 来源外链
+function NewsItemCard({ item }: { item: NewsItem }) {
+  const hasBody = Boolean(item.body || item.bodyEn)
+  // 默认展开，让读者一眼就能看到详情；点击标题行可以收起
+  const [open, setOpen] = useState(true)
+
+  return (
+    <div className="pe-news-item">
+      <div className="pe-news-dot" />
+      <div className="pe-news-body">
+        <button
+          type="button"
+          className="pe-news-head"
+          onClick={() => hasBody && setOpen(v => !v)}
+          aria-expanded={open}
+          disabled={!hasBody}
+        >
+          <p className="pe-news-text">{item.text}</p>
+          {item.textEn && <p className="pe-news-text-en">{item.textEn}</p>}
+          {hasBody && (
+            <span className="pe-news-toggle" aria-hidden="true">
+              {open ? '▾' : '▸'}
+            </span>
+          )}
+        </button>
+
+        {hasBody && open && (
+          <div className="pe-news-detail">
+            {item.body && (
+              <p className="pe-news-body-text">
+                {item.body.split('\n').map((line, i) => (
+                  <span key={i}>{line}{i < item.body!.split('\n').length - 1 && <br />}</span>
+                ))}
+              </p>
+            )}
+            {item.bodyEn && (
+              <p className="pe-news-body-text-en">
+                {item.bodyEn.split('\n').map((line, i) => (
+                  <span key={i}>{line}{i < item.bodyEn!.split('\n').length - 1 && <br />}</span>
+                ))}
+              </p>
+            )}
+          </div>
+        )}
+
+        <div className="pe-news-meta">
+          <span className="pe-news-tag">
+            {item.tag}{item.tagEn ? ` · ${item.tagEn}` : ''}
+          </span>
+          <span>{item.date}</span>
+          {item.source && <span className="pe-news-source">· {item.source}</span>}
+          {item.url ? (
+            <a
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pe-news-link"
+              onClick={e => e.stopPropagation()}
+            >
+              ↗ 阅读原文 / Read source
+            </a>
+          ) : (
+            <span className="pe-news-link-placeholder">· 暂无外链 / no source link</span>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function NewsList({ items }: { items: NewsItem[] }) {
   return (
     <div className="pe-news-card">
-      {items.map((n, i) => {
-        const inner = (
-          <>
-            <div className="pe-news-dot" />
-            <div className="pe-news-body">
-              <p className="pe-news-text">{n.text}</p>
-              {n.textEn && <p className="pe-news-text-en">{n.textEn}</p>}
-              <div className="pe-news-meta">
-                <span className="pe-news-tag">
-                  {n.tag}{n.tagEn ? ` · ${n.tagEn}` : ''}
-                </span>
-                <span>{n.date}</span>
-                {n.source && <span className="pe-news-source">· {n.source}</span>}
-                {n.url && <span className="pe-news-link-hint">↗ source</span>}
-              </div>
-            </div>
-          </>
-        )
-        if (n.url) {
-          return (
-            <a
-              key={i}
-              href={n.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="pe-news-item pe-news-item-link"
-            >
-              {inner}
-            </a>
-          )
-        }
-        return <div key={i} className="pe-news-item">{inner}</div>
-      })}
+      {items.map((n, i) => <NewsItemCard key={i} item={n} />)}
     </div>
   )
 }
