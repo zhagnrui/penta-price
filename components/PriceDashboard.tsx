@@ -50,8 +50,8 @@ function MetricCard({ labelCn, labelEn, value, change }: MetricCardProps) {
 // 新闻条目：标题 + 正文段落（可展开/收起）+ 元信息 + 来源外链
 function NewsItemCard({ item }: { item: NewsItem }) {
   const hasBody = Boolean(item.body || item.bodyEn)
-  // 默认展开，让读者一眼就能看到详情；点击标题行可以收起
-  const [open, setOpen] = useState(true)
+  // 默认收起，版面紧凑；读者点击标题行展开正文
+  const [open, setOpen] = useState(false)
 
   return (
     <div className="pe-news-item">
