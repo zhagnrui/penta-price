@@ -80,6 +80,9 @@ export const metadata: Metadata = {
     images: [OG_IMAGE],
   },
   alternates: { canonical: SITE_URL },
+  verification: {
+    other: { 'baidu-site-verification': ['codeva-ia559VlY6F'] },
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
