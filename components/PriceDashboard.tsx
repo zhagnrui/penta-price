@@ -34,9 +34,18 @@ function InquiryModal({ onClose }: { onClose: () => void }) {
   const set = (k: keyof InquiryForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm(prev => ({ ...prev, [k]: e.target.value }))
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const body = [
+
+    // 1. POST to API (Resend email) — fire and don't block UX on failure
+    fetch('/api/inquiry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
+    }).catch(() => { /* silently fall back to mailto */ })
+
+    // 2. Also open mailto as a reliable fallback
+    const mailLines = [
       `姓名 / Name: ${form.name}`,
       `公司 / Company: ${form.company}`,
       `行业 / Industry: ${form.industry}`,
@@ -45,12 +54,12 @@ function InquiryModal({ onClose }: { onClose: () => void }) {
       `联系方式 / Contact (email/WeChat): ${form.contact}`,
       `备注 / Notes: ${form.notes || '—'}`,
       '',
-      '--- sent via penta-price.com ---',
+      '--- sent via PentaPrice ---',
     ].join('\n')
-
-    const subject = encodeURIComponent(`季戊四醇询价 / Pentaerythritol Quote — ${form.company}`)
-    const mailBody = encodeURIComponent(body)
+    const subject  = encodeURIComponent(`季戊四醇询价 / Pentaerythritol Quote — ${form.company}`)
+    const mailBody = encodeURIComponent(mailLines)
     window.open(`mailto:${SALES_EMAIL}?subject=${subject}&body=${mailBody}`)
+
     setSent(true)
   }
 
@@ -679,7 +688,7 @@ export default function PriceDashboard() {
       {/* Hero */}
       <div className="pe-hero">
         <div>
-          <h1>季戊四醇价格行情 · Pentaerythritol Price Tracker</h1>
+          <h1>PentaPrice · 季戊四醇价格行情</h1>
           <p>
             单季 / 双季 · 国内出厂 + 国际 FOB / CIF · 每周更新
             <br />
