@@ -2,6 +2,48 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 const SITE_URL = 'https://www.pentaprice.com'
+
+// Schema.org structured data — helps Google understand this is a price dataset
+const schemaOrg = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: 'PentaPrice',
+      description: 'Weekly pentaerythritol price tracker — mono & di-PE, China EXW + global FOB/CIF.',
+      inLanguage: ['zh-CN', 'en'],
+    },
+    {
+      '@type': 'Dataset',
+      '@id': `${SITE_URL}/#dataset`,
+      name: 'Pentaerythritol Weekly Price Dataset · 季戊四醇周度价格数据集',
+      description:
+        'Weekly price data for mono-pentaerythritol (95%/98%) and dipentaerythritol: ' +
+        'China domestic EXW (¥/t), FOB Qingdao (USD/t), and global CIF prices (US, EU, SEA). ' +
+        'Updated every week.',
+      url: SITE_URL,
+      license: 'https://creativecommons.org/licenses/by-nc/4.0/',
+      isAccessibleForFree: true,
+      creator: { '@type': 'Organization', name: 'PentaPrice', url: SITE_URL },
+      keywords: [
+        'pentaerythritol price', 'dipentaerythritol price', '季戊四醇价格',
+        '双季戊四醇', 'mono-PE', 'di-PE', 'FOB Qingdao', 'China chemical price',
+      ],
+      temporalCoverage: '2024/2026',
+      spatialCoverage: 'CN, US, EU, SEA',
+      variableMeasured: [
+        { '@type': 'PropertyValue', name: 'Mono-PE China EXW 95%', unitText: 'CNY/t' },
+        { '@type': 'PropertyValue', name: 'Mono-PE China EXW 98%', unitText: 'CNY/t' },
+        { '@type': 'PropertyValue', name: 'Mono-PE FOB Qingdao',   unitText: 'USD/t' },
+        { '@type': 'PropertyValue', name: 'Di-PE Market Avg',       unitText: 'CNY/t' },
+        { '@type': 'PropertyValue', name: 'US CIF pentaerythritol', unitText: 'USD/t' },
+        { '@type': 'PropertyValue', name: 'EU CIF pentaerythritol', unitText: 'USD/t' },
+      ],
+    },
+  ],
+}
 const OG_IMAGE = `${SITE_URL}/og-image.png`
 
 export const metadata: Metadata = {
@@ -43,6 +85,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-CN">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaOrg) }}
+        />
+      </head>
       <body>
         {children}
         <footer className="pe-footer">
