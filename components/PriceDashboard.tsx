@@ -1,7 +1,146 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { currentWeek, type NewsItem } from '@/lib/priceData'
+
+const SALES_EMAIL = 'ryan139@gmail.com'
+
+// ── 询盘 Modal ────────────────────────────────────────
+type InquiryForm = {
+  name: string
+  company: string
+  industry: string
+  grade: string
+  volume: string
+  contact: string
+  notes: string
+}
+
+const EMPTY_FORM: InquiryForm = {
+  name: '', company: '', industry: '', grade: '', volume: '', contact: '', notes: '',
+}
+
+function InquiryModal({ onClose }: { onClose: () => void }) {
+  const [form, setForm] = useState<InquiryForm>(EMPTY_FORM)
+  const [sent, setSent] = useState(false)
+
+  // ESC 关闭
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
+  const set = (k: keyof InquiryForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
+    setForm(prev => ({ ...prev, [k]: e.target.value }))
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const body = [
+      `姓名 / Name: ${form.name}`,
+      `公司 / Company: ${form.company}`,
+      `行业 / Industry: ${form.industry}`,
+      `需求规格 / Grade: ${form.grade}`,
+      `预计月用量 / Monthly volume: ${form.volume} 吨/t`,
+      `联系方式 / Contact (email/WeChat): ${form.contact}`,
+      `备注 / Notes: ${form.notes || '—'}`,
+      '',
+      '--- sent via penta-price.com ---',
+    ].join('\n')
+
+    const subject = encodeURIComponent(`季戊四醇询价 / Pentaerythritol Quote — ${form.company}`)
+    const mailBody = encodeURIComponent(body)
+    window.open(`mailto:${SALES_EMAIL}?subject=${subject}&body=${mailBody}`)
+    setSent(true)
+  }
+
+  return (
+    <div className="pe-modal-backdrop" onClick={onClose}>
+      <div className="pe-modal" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="询盘表单">
+        <div className="pe-modal-header">
+          <div>
+            <h2 className="pe-modal-title">获取报价 · Request a Quote</h2>
+            <p className="pe-modal-sub">填写后将打开您的邮件客户端 · Opens your email client on submit</p>
+          </div>
+          <button className="pe-modal-close" onClick={onClose} aria-label="关闭">✕</button>
+        </div>
+
+        {sent ? (
+          <div className="pe-modal-thanks">
+            <div className="pe-modal-thanks-icon">✓</div>
+            <h3>邮件客户端已打开 / Email client opened</h3>
+            <p>请在邮件客户端中确认发送。我们将在 1 个工作日内回复。<br />Please confirm send in your email client. We reply within 1 business day.</p>
+            <p className="pe-modal-thanks-email">📧 {SALES_EMAIL}</p>
+            <button className="pe-cta-btn" style={{ marginTop: '1rem' }} onClick={onClose}>关闭 / Close</button>
+          </div>
+        ) : (
+          <form className="pe-modal-form" onSubmit={handleSubmit}>
+            <div className="pe-form-row-2">
+              <label className="pe-form-field">
+                <span className="pe-form-label">姓名 Name <em>*</em></span>
+                <input required value={form.name} onChange={set('name')} placeholder="张三 / Zhang San" />
+              </label>
+              <label className="pe-form-field">
+                <span className="pe-form-label">公司 Company <em>*</em></span>
+                <input required value={form.company} onChange={set('company')} placeholder="XX化工有限公司" />
+              </label>
+            </div>
+
+            <div className="pe-form-row-2">
+              <label className="pe-form-field">
+                <span className="pe-form-label">行业 Industry <em>*</em></span>
+                <select required value={form.industry} onChange={set('industry')}>
+                  <option value="">请选择 / Please select</option>
+                  <option value="涂料 / Coatings">涂料 / Coatings</option>
+                  <option value="润滑油 / Lubricants">润滑油 / Lubricants</option>
+                  <option value="抗氧剂 / Antioxidants">抗氧剂 / Antioxidants</option>
+                  <option value="其他 / Other">其他 / Other</option>
+                </select>
+              </label>
+              <label className="pe-form-field">
+                <span className="pe-form-label">需求规格 Grade <em>*</em></span>
+                <select required value={form.grade} onChange={set('grade')}>
+                  <option value="">请选择 / Please select</option>
+                  <option value="单季 95% Mono-PE 95%">单季 95% / Mono-PE 95%</option>
+                  <option value="单季 98% Mono-PE 98%">单季 98% / Mono-PE 98%</option>
+                  <option value="双季 Di-PE">双季 / Di-PE</option>
+                </select>
+              </label>
+            </div>
+
+            <div className="pe-form-row-2">
+              <label className="pe-form-field">
+                <span className="pe-form-label">预计月用量 Monthly volume (吨/t) <em>*</em></span>
+                <input required type="number" min="1" value={form.volume} onChange={set('volume')} placeholder="e.g. 50" />
+              </label>
+              <label className="pe-form-field">
+                <span className="pe-form-label">联系方式 Contact (email / WeChat) <em>*</em></span>
+                <input required value={form.contact} onChange={set('contact')} placeholder="email 或 微信号" />
+              </label>
+            </div>
+
+            <label className="pe-form-field">
+              <span className="pe-form-label">备注 Notes</span>
+              <textarea rows={3} value={form.notes} onChange={set('notes')} placeholder="交货地、包装要求、其他说明… / Delivery location, packaging, other requirements…" />
+            </label>
+
+            <div className="pe-modal-footer">
+              <p className="pe-modal-disclaimer">
+                提交后将打开您默认邮件客户端，收件人已预填为 {SALES_EMAIL}
+                <br />
+                On submit your email client opens pre-addressed to {SALES_EMAIL}
+              </p>
+              <div className="pe-modal-actions">
+                <button type="button" className="pe-modal-cancel" onClick={onClose}>取消 / Cancel</button>
+                <button type="submit" className="pe-cta-btn">发送询价 / Send inquiry →</button>
+              </div>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  )
+}
 
 // ── 通用小组件 ────────────────────────────────────────
 
@@ -529,9 +668,13 @@ function IntlPanel() {
 // ── 主组件 ────────────────────────────────────────────
 export default function PriceDashboard() {
   const [tab, setTab] = useState<'mono' | 'di' | 'intl'>('mono')
+  const [showModal, setShowModal] = useState(false)
+  const openModal  = useCallback(() => setShowModal(true),  [])
+  const closeModal = useCallback(() => setShowModal(false), [])
   const d = currentWeek
 
   return (
+    <>
     <main className="pe-main">
       {/* Hero */}
       <div className="pe-hero">
@@ -594,8 +737,10 @@ export default function PriceDashboard() {
             98% / 95% grade · Bulk stock · Full export docs · Technical support
           </p>
         </div>
-        <button className="pe-cta-btn">获取报价 / Get quote →</button>
+        <button className="pe-cta-btn" onClick={openModal}>获取报价 / Get quote →</button>
       </div>
     </main>
+    {showModal && <InquiryModal onClose={closeModal} />}
+    </>
   )
 }
