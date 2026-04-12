@@ -701,6 +701,15 @@ export default function PriceDashboard() {
         </div>
       </div>
 
+      {/* 计算工具导航栏 */}
+      <div className="pe-tools-nav">
+        <span className="pe-tools-nav-label">🔧 计算工具 · Calculators</span>
+        <a href="/calculator/lubricant" className="pe-tools-nav-link">润滑油四酯收率</a>
+        <a href="/calculator/antioxidant" className="pe-tools-nav-link">抗氧剂1010投料</a>
+        <a href="/calculator/alkyd" className="pe-tools-nav-link">醇酸树脂配方</a>
+        <a href="/calculator" className="pe-tools-nav-all">全部工具 →</a>
+      </div>
+
       {/* Tabs */}
       <div className="pe-tabs">
         {([

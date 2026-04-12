@@ -446,6 +446,50 @@ html, body {
   margin: 0 0 8px;
 }
 
+/* ── 计算工具导航栏 · Tools Nav ── */
+.pe-tools-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--pe-surface);
+  border: 1px solid var(--pe-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+}
+.pe-tools-nav-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pe-text-hint);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+.pe-tools-nav-link {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pe-green-dark);
+  text-decoration: none;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--pe-green-light);
+  border: 1px solid var(--pe-green-mid);
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.pe-tools-nav-link:hover { background: var(--pe-green-mid); color: var(--pe-green-deep); }
+.pe-tools-nav-all {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pe-green);
+  text-decoration: none;
+  margin-left: auto;
+  white-space: nowrap;
+}
+.pe-tools-nav-all:hover { text-decoration: underline; }
+
 /* ── 术语/单位说明 · Glossary ── */
 .pe-glossary {
   margin: 1.25rem 0 0;

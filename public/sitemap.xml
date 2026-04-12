@@ -8,9 +8,46 @@
     <lastmod>2026-04-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://www.pentaprice.com/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.pentaprice.com/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.pentaprice.com/"/>
+  </url>
+
+  <!-- Calculator Index -->
+  <url>
+    <loc>https://www.pentaprice.com/calculator</loc>
+    <lastmod>2026-04-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Lubricant Ester Calculator -->
+  <url>
+    <loc>https://www.pentaprice.com/calculator/lubricant</loc>
+    <lastmod>2026-04-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Antioxidant 1010 Calculator -->
+  <url>
+    <loc>https://www.pentaprice.com/calculator/antioxidant</loc>
+    <lastmod>2026-04-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Alkyd Resin Calculator -->
+  <url>
+    <loc>https://www.pentaprice.com/calculator/alkyd</loc>
+    <lastmod>2026-04-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Weekly Archive: Week 15, 2026 -->
+  <url>
+    <loc>https://www.pentaprice.com/weekly/2026-w15</loc>
+    <lastmod>2026-04-10</lastmod>
+    <changefreq>never</changefreq>
+    <priority>0.6</priority>
   </url>
 
 </urlset>
