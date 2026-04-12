@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 
-const SITE_URL = 'https://penta-price.vercel.app'
+const SITE_URL = 'https://www.pentaprice.com'
 const OG_IMAGE = `${SITE_URL}/og-image.png`
 
 export const metadata: Metadata = {

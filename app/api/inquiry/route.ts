@@ -50,7 +50,7 @@ function buildHtml(p: InquiryPayload): string {
     </div>
 
     <div style="padding:16px 28px;background:#f4faf7;border-top:1px solid #e1f5ee;font-size:11px;color:#7a9e8a;text-align:center">
-      PentaPrice · penta-price.vercel.app · 数据仅供参考
+      PentaPrice · www.pentaprice.com · 数据仅供参考
     </div>
   </div>
 </body>
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { error } = await resend.emails.send({
-      from: "PentaPrice询盘 <onboarding@resend.dev>",   // ← 验证域名后换成你自己的
+      from: "PentaPrice询盘 <noreply@pentaprice.com>",    // ← Resend 验证域名后生效；未验证时用 onboarding@resend.dev
       to: NOTIFY_EMAIL,
       replyTo: payload.contact.includes("@") ? payload.contact : undefined,
       subject: `季戊四醇询价 — ${payload.company} · ${payload.grade}`,
