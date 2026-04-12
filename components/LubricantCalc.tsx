@@ -39,8 +39,7 @@ function calculate(peKg: number, acidMW: number, molarRatio: number, purity: num
   const esterMW           = MW_PE + 4 * acidMW - 4 * MW_WATER
   const theoreticalKg     = (peMoles * esterMW) / 1000
   const waterKg           = (peMoles * 4 * MW_WATER) / 1000
-  const lossKg            = theoreticalKg * 0.02
-  const practicalYield    = theoreticalKg * 0.95
+  const practicalYield    = theoreticalKg * 0.95   // 经验收率系数 0.95（含馏分损耗、残留等）
   // PE cost: use grade98.low price (¥/t) → ¥/kg = price / 1000
   const pePrice           = currentWeek.mono.grade98.low
   const peCost            = peKg * pePrice / 1000
@@ -50,7 +49,6 @@ function calculate(peKg: number, acidMW: number, molarRatio: number, purity: num
     acidKg:          acidKg,
     theoreticalKg:   theoreticalKg,
     waterKg:         waterKg,
-    lossKg:          lossKg,
     practicalYield:  practicalYield,
     peCost:          peCost,
     esterMW:         esterMW,
@@ -234,19 +232,13 @@ export default function LubricantCalc() {
           />
           <ResultRow
             label="脱水量"
-            labelEn="Water removed"
+            labelEn="Water removed (condensate)"
             value={fmt(result.waterKg)}
             unit="kg"
           />
           <ResultRow
-            label="物料损耗估算 (2%)"
-            labelEn="Estimated material loss (2%)"
-            value={fmt(result.lossKg)}
-            unit="kg"
-          />
-          <ResultRow
-            label="实际预估产量"
-            labelEn="Practical yield estimate"
+            label="实际预估产量 (收率 95%)"
+            labelEn="Practical yield (η = 0.95, incl. distillation loss)"
             value={fmt(result.practicalYield)}
             unit="kg"
             highlight

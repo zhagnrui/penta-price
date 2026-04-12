@@ -48,12 +48,13 @@ function calculate(
   // Theoretical yield (before losses)
   const theoreticalKg  = (targetMoles * MW_AO1010) / 1000
 
-  // Practical yield after applying overall yield %
-  const practicalKg    = theoreticalKg * yieldFrac
-
   // PE cost using grade98 low price (¥/t → ¥)
   const pePrice        = currentWeek.mono.grade98.low
   const peCost         = (peActualKg * pePrice) / 1000
+
+  // Methanol recovery value (market ref ≈ ¥2,800/t as of 2026)
+  const methanolPrice  = 2800   // ¥/t，甲醇参考价，可随市场调整
+  const methanolValue  = (methanolKg * methanolPrice) / 1000
 
   return {
     targetMoles,
@@ -62,8 +63,8 @@ function calculate(
     mdhpActualKg,
     methanolKg,
     theoreticalKg,
-    practicalKg,
     peCost,
+    methanolValue,
   }
 }
 
@@ -259,17 +260,16 @@ export default function AntioxidantCalc() {
             unit="kg"
           />
           <ResultRow
-            label="理论产量"
-            labelEn="Theoretical AO1010 yield"
+            label={`理论批次投料量 (按${yieldPct}%收率反算)`}
+            labelEn={`Theoretical throughput (back-calc at ${yieldPct}% yield)`}
             value={fmt(result.theoreticalKg)}
             unit="kg"
           />
           <ResultRow
-            label="预估实际产量"
-            labelEn="Estimated practical yield"
-            value={fmt(result.practicalKg)}
-            unit="kg"
-            highlight
+            label="副产甲醇回收参考价值"
+            labelEn="Methanol byproduct recovery value (ref. ¥2,800/t)"
+            value={`¥${fmt(result.methanolValue, 0)}`}
+            unit=""
           />
           <ResultRow
             label="当前PE原料成本"

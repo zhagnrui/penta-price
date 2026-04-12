@@ -51,35 +51,61 @@ const DEFAULTS = {
   purity:     98,
 }
 
+// ── MW constants ─────────────────────────────────────
+const MW_PA       = 148.12   // 苯酐 Phthalic anhydride g/mol
+const MW_GLYCEROL = 92.09    // 甘油
+const MW_PE_ALKYD = 136.15   // 季戊四醇
+
 // ── Calculation ──────────────────────────────────────
+// 方法：脂肪酸法（fatty acid method）
+// 1. 确定植物油用量（由油长决定）
+// 2. 由 paRatio（PA:多元醇 摩尔比）和多元醇 MW 正向计算 PA 与多元醇用量
+// 3. 酸值由 PA 用量与总重推算（OH 基过量决定残余酸值）
 function calculate(
   targetKg: number,
   oilLength: number,
   paRatio: number,
   purity: number,
+  polyolMW: number,
 ) {
-  const oil_kg          = targetKg * (oilLength / 100)
-  const resin_excl_oil  = targetKg - oil_kg
+  const oil_kg         = targetKg * (oilLength / 100)
+  const non_oil_kg     = targetKg - oil_kg   // 非油部分 = PA + 多元醇
 
-  const fatty_acid_kg   = oil_kg * 0.96
-  const pa_kg           = resin_excl_oil * 0.45
-  const polyol_kg       = resin_excl_oil - pa_kg + (oil_kg * 0.04)
+  // PA 和多元醇的摩尔关系：n_PA / n_polyol = paRatio
+  // PA MW=148.12，polyol MW 由用户选择
+  // pa_kg / 148.12 = paRatio × (polyol_kg / polyolMW)
+  // pa_kg + polyol_kg = non_oil_kg
+  // 联立求解：
+  const ratio          = (paRatio * polyolMW) / MW_PA   // pa_kg / polyol_kg
+  const polyol_kg      = non_oil_kg / (1 + ratio)
+  const pa_kg          = non_oil_kg - polyol_kg
 
-  // Estimated acid value (mgKOH/g) — empirical approximation
-  const acid_value = Math.max(3, Math.min(30,
-    5 + (pa_kg / targetKg) * 80 - (oilLength - 50) * 0.3
-  ))
+  const fatty_acid_kg  = oil_kg * 0.955   // 植物油中脂肪酸含量约95.5%（甘油酯水解后）
 
-  const oil_length_check = (oil_kg / targetKg) * 100
+  // 酸值估算：残余 COOH 基 ≈ (PA摩尔 - 反应消耗的COOH摩尔) × 56100 / 总质量
+  // PA每摩尔含2个COOH；多元醇每摩尔含 functionality 个OH
+  // 实际反应COOH消耗 ≈ min(PA×2, 多元醇OH数)
+  // 残余COOH ≈ PA×2 - 多元醇OH（当PA过量时为正，即有余酸）
+  const pa_moles       = (pa_kg * 1000) / MW_PA
+  const polyol_moles   = (polyol_kg * 1000 * (purity / 100)) / polyolMW
+  const polyol_fn      = polyolMW === MW_PE_ALKYD ? 4 : 3   // PE官能度4, 甘油3
+  const oh_moles       = polyol_moles * polyol_fn
+  const cooh_moles     = pa_moles * 2
+  const excess_cooh    = Math.max(0, cooh_moles - oh_moles)
+  const acid_value     = Math.min(40, (excess_cooh * 56100) / (targetKg * 1000))
 
-  // PE cost: grade95.low (¥/t) corrected for purity
-  const pe_price = currentWeek.mono.grade95.low
-  const pe_cost  = polyol_kg * pe_price / 1000 * (purity / 98)
+  // OH过量比（>1表示OH过量，有利于低酸值）
+  const oh_excess_ratio = oh_moles / cooh_moles
 
-  // Composition percentages for breakdown bar
-  const oil_pct    = (oil_kg    / targetKg) * 100
-  const pa_pct     = (pa_kg     / targetKg) * 100
-  const polyol_pct = (polyol_kg / targetKg) * 100
+  // Composition percentages — 归一化到100%
+  const total_check    = oil_kg + pa_kg + polyol_kg
+  const oil_pct        = (oil_kg    / total_check) * 100
+  const pa_pct         = (pa_kg     / total_check) * 100
+  const polyol_pct     = (polyol_kg / total_check) * 100
+
+  // PE cost
+  const pe_price       = currentWeek.mono.grade95.low
+  const pe_cost        = polyol_kg * pe_price / 1000
 
   return {
     oil_kg,
@@ -87,7 +113,8 @@ function calculate(
     pa_kg,
     fatty_acid_kg,
     acid_value,
-    oil_length_check,
+    oh_excess_ratio,
+    oil_length_check: oilLength,   // 直接用输入值，无需重算
     pe_cost,
     oil_pct,
     pa_pct,
@@ -162,8 +189,8 @@ export default function AlkydCalc() {
   const polyol = POLYOL_OPTIONS[polyolKey]
 
   const result = useMemo(
-    () => calculate(targetKg, oilLength, paRatio, purity),
-    [targetKg, oilLength, paRatio, purity],
+    () => calculate(targetKg, oilLength, paRatio, purity, polyol.mw),
+    [targetKg, oilLength, paRatio, purity, polyol.mw],
   )
 
   const oilCat = oilLengthCategory(oilLength)
@@ -369,8 +396,14 @@ export default function AlkydCalc() {
             highlight
           />
           <ResultRow
+            label="OH/COOH 摩尔比"
+            labelEn="OH/COOH molar ratio (>1 = OH excess, lower AV)"
+            value={fmt(result.oh_excess_ratio, 2)}
+            unit="×"
+          />
+          <ResultRow
             label="油长确认"
-            labelEn="Oil length check"
+            labelEn="Oil length confirmation"
             value={fmt(result.oil_length_check, 1)}
             unit="%"
           />
