@@ -116,23 +116,7 @@ export default function CalculatorIndexPage() {
             href={tool.href}
             style={{ textDecoration: 'none', display: 'block' }}
           >
-            <div className="pe-card" style={{
-              padding: '1.5rem',
-              cursor: 'pointer',
-              transition: 'box-shadow 0.2s, transform 0.15s',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 20px rgba(29,158,117,0.18)'
-                ;(e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLDivElement).style.boxShadow = ''
-                ;(e.currentTarget as HTMLDivElement).style.transform = ''
-              }}
-            >
+            <div className="pe-card pe-calc-tool-card">
               {/* 头部 */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                 <span style={{ fontSize: '32px', lineHeight: 1 }}>{tool.icon}</span>
