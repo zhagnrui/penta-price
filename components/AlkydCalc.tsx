@@ -82,26 +82,47 @@ function calculate(
 
   const fatty_acid_kg  = oil_kg * 0.955   // 植物油中脂肪酸含量约95.5%（甘油酯水解后）
 
-  // 酸值估算：残余 COOH 基 ≈ (PA摩尔 - 反应消耗的COOH摩尔) × 56100 / 总质量
-  // PA每摩尔含2个COOH；多元醇每摩尔含 functionality 个OH
-  // 实际反应COOH消耗 ≈ min(PA×2, 多元醇OH数)
-  // 残余COOH ≈ PA×2 - 多元醇OH（当PA过量时为正，即有余酸）
+  // 摩尔平衡计算
   const pa_moles       = (pa_kg * 1000) / MW_PA
   const polyol_moles   = (polyol_kg * 1000 * (purity / 100)) / polyolMW
   const polyol_fn      = polyolMW === MW_PE_ALKYD ? 4 : 3   // PE官能度4, 甘油3
   const oh_moles       = polyol_moles * polyol_fn
   const cooh_moles     = pa_moles * 2
-  const excess_cooh    = Math.max(0, cooh_moles - oh_moles)
-  const acid_value     = Math.min(40, (excess_cooh * 56100) / (targetKg * 1000))
 
-  // OH过量比（>1表示OH过量，有利于低酸值）
+  // OH/COOH 比（>1 = OH过量，正常设计区间 1.1–1.8）
   const oh_excess_ratio = oh_moles / cooh_moles
 
-  // Composition percentages — 归一化到100%
-  const total_check    = oil_kg + pa_kg + polyol_kg
-  const oil_pct        = (oil_kg    / total_check) * 100
-  const pa_pct         = (pa_kg     / total_check) * 100
-  const polyol_pct     = (polyol_kg / total_check) * 100
+  // ── 酸值估算（修正版）─────────────────────────────────
+  // 酯化反应是可逆平衡，即使OH过量，成品酸值永远不为零。
+  // 实际酸值由OH过量程度、反应温度、时间、催化剂共同决定。
+  // 经验模型（参考涂料工业标准 GB/T 6743–2008）：
+  //   OH过量比 1.0–1.2 → AV ≈ 15–25 mgKOH/g（需延长反应时间）
+  //   OH过量比 1.2–1.5 → AV ≈ 8–15 mgKOH/g（中油醇酸典型值）
+  //   OH过量比 1.5–2.0 → AV ≈ 5–10 mgKOH/g（过量充足，易控制）
+  //   OH过量比 <1.0（COOH过量）→ 按实际余酸计算（酸值偏高）
+  let acid_value: number
+  if (oh_excess_ratio < 1.0) {
+    // COOH 过量：直接计算余酸量
+    const excess_cooh = (cooh_moles - oh_moles) * 56100
+    acid_value = Math.min(60, excess_cooh / (targetKg * 1000))
+  } else {
+    // OH 过量（正常设计）：经验公式，随OH过量比增大而降低
+    // 基准值20，每增加0.1的OH过量比降低约2.5 mgKOH/g，下限5
+    acid_value = Math.max(5, 20 - (oh_excess_ratio - 1.0) * 25)
+  }
+
+  // ── 缩合脱水量 & 实际原料投量（修正版）──────────────────
+  // 酯化脱水：每mol OH-COOH反应脱出1mol水
+  // 参与反应的mol数 = min(cooh_moles, oh_moles) ≈ cooh_moles（COOH通常是限量）
+  const water_expelled   = (Math.min(cooh_moles, oh_moles) * 18.015) / 1000
+  // 实际总原料投量 = 目标产量 + 脱水量（约多投5–8%）
+  const raw_material_total = targetKg + water_expelled
+
+  // Composition percentages — 归一化到100%（基于原料总量，非产品）
+  const total_raw      = oil_kg + pa_kg + polyol_kg
+  const oil_pct        = (oil_kg    / total_raw) * 100
+  const pa_pct         = (pa_kg     / total_raw) * 100
+  const polyol_pct     = (polyol_kg / total_raw) * 100
 
   // PE cost
   const pe_price       = currentWeek.mono.grade95.low
@@ -114,7 +135,9 @@ function calculate(
     fatty_acid_kg,
     acid_value,
     oh_excess_ratio,
-    oil_length_check: oilLength,   // 直接用输入值，无需重算
+    water_expelled,
+    raw_material_total,
+    oil_length_check: oilLength,
     pe_cost,
     oil_pct,
     pa_pct,
@@ -400,6 +423,19 @@ export default function AlkydCalc() {
             labelEn="OH/COOH molar ratio (>1 = OH excess, lower AV)"
             value={fmt(result.oh_excess_ratio, 2)}
             unit="×"
+          />
+          <ResultRow
+            label="缩合脱水估算"
+            labelEn="Estimated condensation water expelled"
+            value={fmt(result.water_expelled)}
+            unit="kg"
+          />
+          <ResultRow
+            label="建议原料总投量（含脱水补偿）"
+            labelEn="Recommended total raw material input (incl. water loss)"
+            value={fmt(result.raw_material_total)}
+            unit="kg"
+            highlight
           />
           <ResultRow
             label="油长确认"

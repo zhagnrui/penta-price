@@ -40,18 +40,21 @@ function calculate(peKg: number, acidMW: number, molarRatio: number, purity: num
   const theoreticalKg     = (peMoles * esterMW) / 1000
   const waterKg           = (peMoles * 4 * MW_WATER) / 1000
   const practicalYield    = theoreticalKg * 0.95   // 经验收率系数 0.95（含馏分损耗、残留等）
+  // 过量酸回收量（摩尔比超出4.0的部分，蒸馏回收再利用）
+  const excessAcidKg      = (acidMolesNeeded - peMoles * 4) * acidMW / 1000
   // PE cost: use grade98.low price (¥/t) → ¥/kg = price / 1000
   const pePrice           = currentWeek.mono.grade98.low
   const peCost            = peKg * pePrice / 1000
 
   return {
-    peMoles:         peMoles,
-    acidKg:          acidKg,
-    theoreticalKg:   theoreticalKg,
-    waterKg:         waterKg,
-    practicalYield:  practicalYield,
-    peCost:          peCost,
-    esterMW:         esterMW,
+    peMoles,
+    acidKg,
+    theoreticalKg,
+    waterKg,
+    excessAcidKg,
+    practicalYield,
+    peCost,
+    esterMW,
   }
 }
 
@@ -231,9 +234,15 @@ export default function LubricantCalc() {
             unit="kg"
           />
           <ResultRow
-            label="脱水量"
-            labelEn="Water removed (condensate)"
+            label="脱水量（缩合水）"
+            labelEn="Condensation water removed"
             value={fmt(result.waterKg)}
+            unit="kg"
+          />
+          <ResultRow
+            label="过量酸回收量（可循环利用）"
+            labelEn="Excess acid recoverable (distillation recycle)"
+            value={fmt(result.excessAcidKg)}
             unit="kg"
           />
           <ResultRow

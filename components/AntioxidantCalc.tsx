@@ -260,14 +260,14 @@ export default function AntioxidantCalc() {
             unit="kg"
           />
           <ResultRow
-            label={`理论批次投料量 (按${yieldPct}%收率反算)`}
-            labelEn={`Theoretical throughput (back-calc at ${yieldPct}% yield)`}
+            label={`理论AO1010生成量（${yieldPct}%收率前）`}
+            labelEn={`Theoretical AO1010 before yield loss (÷${yieldPct}%)`}
             value={fmt(result.theoreticalKg)}
             unit="kg"
           />
           <ResultRow
-            label="副产甲醇回收参考价值"
-            labelEn="Methanol byproduct recovery value (ref. ¥2,800/t)"
+            label="副产甲醇参考回收价值（¥2,800/t）"
+            labelEn="Methanol byproduct recovery value (ref. price ¥2,800/t)"
             value={`¥${fmt(result.methanolValue, 0)}`}
             unit=""
           />
