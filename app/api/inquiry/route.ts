@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { error } = await resend.emails.send({
-      from: "PentaPrice询盘 <onboarding@resend.dev>",      // ← 临时用测试域；pentaprice.com 验证通过后再换回
+      from: "PentaPrice询盘 <noreply@pentaprice.com>",
       to: NOTIFY_EMAIL,
       replyTo: payload.contact.includes("@") ? payload.contact : undefined,
       subject: `季戊四醇询价 — ${payload.company} · ${payload.grade}`,
