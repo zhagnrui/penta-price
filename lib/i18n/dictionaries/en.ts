@@ -182,6 +182,12 @@ const en: Dictionary = {
         desc: 'Enter target oil length and batch size — automatically calculates PE/glycerol, phthalic anhydride, and vegetable oil quantities, with composition breakdown and estimated acid value.',
         tags: ['Alkyd resin', 'Coatings', 'Oil length', 'Phthalic anhydride'],
       },
+      ifr: {
+        title: 'IFR Coating Ratio Calculator',
+        titleEn: 'Intumescent Fire Retardant System',
+        desc: 'Enter fire resistance rating and substrate type to get recommended APP:PER:MEL "three-in-one" ratios, procurement quantities for ammonium polyphosphate and melamine, and estimated coating yield.',
+        tags: ['Fire retardant coating', 'IFR', 'APP', 'Melamine', 'Carbon source'],
+      },
     },
   },
 

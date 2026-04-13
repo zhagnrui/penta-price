@@ -182,6 +182,12 @@ const de: Dictionary = {
         desc: 'Zielölgehalt und Chargengröße eingeben — automatische Berechnung von PE/Glycerin, Phthalsäureanhydrid und Pflanzenöl, mit Formulierungsübersicht und geschätzter Säurezahl.',
         tags: ['Alkydharz', 'Lackierung', 'Ölgehalt', 'Phthalsäureanhydrid'],
       },
+      ifr: {
+        title: 'IFR-Beschichtungs-Verhältnisrechner',
+        titleEn: 'Intumeszierendes Brandschutzsystem',
+        desc: 'Feuerwiderstandsklasse und Substrat eingeben — empfohlene APP:PER:MEL-Verhältnisse und Beschaffungsmengen für Ammoniumpolyphosphat und Melamin, mit geschätzter Beschichtungsausbeute.',
+        tags: ['Brandschutzbeschichtung', 'IFR', 'APP', 'Melamin', 'Kohlenstoffquelle'],
+      },
     },
   },
 

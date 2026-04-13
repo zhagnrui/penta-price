@@ -28,11 +28,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-const TOOL_KEYS = ['lubricant', 'antioxidant', 'alkyd'] as const
+const TOOL_KEYS = ['lubricant', 'antioxidant', 'alkyd', 'ifr'] as const
 const TOOL_ICONS: Record<string, string> = {
   lubricant:   '🛢️',
   antioxidant: '🧪',
   alkyd:       '🎨',
+  ifr:         '🔥',
 }
 
 export default async function CalculatorIndexPage({ params }: Props) {
