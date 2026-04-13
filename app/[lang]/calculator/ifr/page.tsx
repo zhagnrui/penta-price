@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { isValidLocale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/getDictionary'
 import IFRCalc from '@/components/IFRCalc'
+import IFRBatchCalc from '@/components/IFRBatchCalc'
 
 const SITE_URL = 'https://www.pentaprice.com'
 
@@ -89,6 +90,36 @@ export default async function IFRPage({ params }: Props) {
       </div>
 
       <IFRCalc lang={lang} dict={dict} />
+
+      {/* 分割线 */}
+      <div style={{ margin: '2.5rem 0 2rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ flex: 1, height: '1px', background: 'var(--pe-border-light)' }} />
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '8px',
+          padding: '6px 16px', borderRadius: '20px',
+          background: 'var(--pe-green-light)', border: '1px solid var(--pe-green-mid)',
+        }}>
+          <span style={{ fontSize: '14px' }}>🧪</span>
+          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--pe-green-dark)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+            批次配方优化器 · COA-Based Batch Optimizer
+          </span>
+        </div>
+        <div style={{ flex: 1, height: '1px', background: 'var(--pe-border-light)' }} />
+      </div>
+
+      {/* 批次优化器说明 */}
+      <div style={{ marginBottom: '1.5rem' }}>
+        <h2 style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 6px', color: 'var(--pe-text-main)' }}>
+          基于检测报告的化学计量分析
+        </h2>
+        <p style={{ fontSize: '13px', color: 'var(--pe-text-muted)', margin: 0, maxWidth: '680px', lineHeight: 1.7 }}>
+          每批 APP、PER、MEL 的实际纯度因供应商和批次不同而波动。将检测报告（COA）中的关键指标填入下方，
+          计算器将精确分析本批次的磷酸化程度（P/OH 比）和酸-气平衡（P:N 比），给出量化调整建议——
+          比固定比例表更贴近实际生产。
+        </p>
+      </div>
+
+      <IFRBatchCalc />
     </main>
   )
 }
