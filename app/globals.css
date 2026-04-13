@@ -1133,3 +1133,45 @@ html, body {
   border-radius: var(--radius-md);
   border: 1px dashed var(--pe-border);
 }
+
+/* ── Language switcher ─────────────────────────────── */
+.pe-lang-bar {
+  position: fixed;
+  top: 10px;
+  right: 14px;
+  z-index: 200;
+}
+
+.pe-lang-switcher {
+  display: flex;
+  gap: 4px;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--pe-border);
+  border-radius: 20px;
+  padding: 3px 5px;
+  box-shadow: 0 2px 8px rgba(15,110,86,0.10);
+  backdrop-filter: blur(6px);
+}
+
+.pe-lang-btn {
+  background: transparent;
+  border: none;
+  border-radius: 14px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--pe-text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.pe-lang-btn:hover {
+  background: var(--pe-green-light);
+  color: var(--pe-green-dark);
+}
+
+.pe-lang-btn-active {
+  background: var(--pe-green) !important;
+  color: #fff !important;
+}
