@@ -197,6 +197,12 @@ const zh = {
         desc: '输入耐火极限和基材类型，自动给出 APP:PER:MEL "三位一体" 推荐比例，计算配套采购量并估算涂料产能。适用钢结构 / 木材 / 混凝土基材。',
         tags: ['防火涂料', 'IFR', 'APP', '三聚氰胺', '季戊四醇碳源'],
       },
+      ifrPro: {
+        title: '膨胀阻燃Pro配方优化器',
+        titleEn: 'IFR Pro Advanced Formulation Optimizer',
+        desc: '专业级性能预测与工艺分析：基于COA数据进行化学计量分析，预测LOI/PHRR/THRF性能指标，评估5大工艺风险，引用16+学术论文支持。适合工程设计、专利申请、批次对标。',
+        tags: ['防火涂料Pro', '性能预测', '学术计算', 'LOI PHRR THRF', '工艺风险'],
+      },
     },
   },
 

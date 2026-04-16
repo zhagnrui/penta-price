@@ -188,6 +188,12 @@ const de: Dictionary = {
         desc: 'Feuerwiderstandsklasse und Substrat eingeben — empfohlene APP:PER:MEL-Verhältnisse und Beschaffungsmengen für Ammoniumpolyphosphat und Melamin, mit geschätzter Beschichtungsausbeute.',
         tags: ['Brandschutzbeschichtung', 'IFR', 'APP', 'Melamin', 'Kohlenstoffquelle'],
       },
+      ifrPro: {
+        title: 'IFR Pro Erweiterte Optimierung',
+        titleEn: 'IFR Leistungsvorhersage-Engine',
+        desc: 'Professionelle Formulierungsoptimierung: Stöchiometrische Analyse von Zertifikatsdaten, LOI/PHRR/THRF-Leistungsprognose, Prozessrisikobewertung über 5 Module, 16+ akademische Papierverweis. Ideal für Ingenieur-Dokumentation, Patentanwendungen und Chargen-Benchmarking.',
+        tags: ['Brandschutz Pro', 'Leistungsvorhersage', 'Akademische Unterstützung', 'LOI PHRR THRF', 'Risikobewertung'],
+      },
     },
   },
 

@@ -188,6 +188,12 @@ const en: Dictionary = {
         desc: 'Enter fire resistance rating and substrate type to get recommended APP:PER:MEL "three-in-one" ratios, procurement quantities for ammonium polyphosphate and melamine, and estimated coating yield.',
         tags: ['Fire retardant coating', 'IFR', 'APP', 'Melamine', 'Carbon source'],
       },
+      ifrPro: {
+        title: 'IFR Pro Advanced Optimizer',
+        titleEn: 'IFR Performance Prediction Engine',
+        desc: 'Enterprise-grade formulation optimization: stoichiometric analysis from COA data, LOI/PHRR/THRF performance forecasting, process risk assessment across 5 modules, 16+ academic paper citations. Ideal for engineering documentation, patent applications, and batch benchmarking.',
+        tags: ['Fire retardant Pro', 'Performance prediction', 'Academic support', 'LOI PHRR THRF', 'Risk assessment'],
+      },
     },
   },
 

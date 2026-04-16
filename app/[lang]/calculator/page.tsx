@@ -28,12 +28,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-const TOOL_KEYS = ['lubricant', 'antioxidant', 'alkyd', 'ifr'] as const
+const TOOL_KEYS = ['lubricant', 'antioxidant', 'alkyd', 'ifr', 'ifrPro'] as const
 const TOOL_ICONS: Record<string, string> = {
   lubricant:   '🛢️',
   antioxidant: '🧪',
   alkyd:       '🎨',
   ifr:         '🔥',
+  ifrPro:      '🔬',
 }
 
 export default async function CalculatorIndexPage({ params }: Props) {
@@ -79,38 +80,78 @@ export default async function CalculatorIndexPage({ params }: Props) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
         {TOOL_KEYS.map(key => {
           const tool = ci.tools[key]
+          const isPro = key === 'ifrPro'
           return (
             <Link key={key} href={`/${lang}/calculator/${key}`} style={{ textDecoration: 'none', display: 'block' }}>
-              <div className="pe-card pe-calc-tool-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+              <div
+                className={isPro ? '' : 'pe-card pe-calc-tool-card'}
+                style={isPro ? {
+                  background: 'linear-gradient(135deg, #0F6E56, #1D9E75)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '1.25rem',
+                  color: '#fff',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                } : {}}
+              >
+                {isPro && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    width: '100px',
+                    height: '100px',
+                    background: 'rgba(255,255,255,0.05)',
+                    borderRadius: '50%',
+                    transform: 'translate(30%, -30%)',
+                  }} />
+                )}
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', position: 'relative', zIndex: 1 }}>
                   <span style={{ fontSize: '32px', lineHeight: 1 }}>{TOOL_ICONS[key]}</span>
-                  <span style={{
-                    background: '#1D9E7520', color: '#1D9E75', fontSize: '10px', fontWeight: 700,
-                    padding: '3px 8px', borderRadius: '12px', border: '1px solid #1D9E7540',
-                  }}>
-                    {ci.activeBadge}
-                  </span>
+                  {isPro ? (
+                    <span style={{
+                      background: 'rgba(255,255,255,0.25)', color: '#fff', fontSize: '10px', fontWeight: 700,
+                      padding: '4px 10px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.4)',
+                      backdropFilter: 'blur(6px)',
+                    }}>
+                      ⭐ Pro
+                    </span>
+                  ) : (
+                    <span style={{
+                      background: '#1D9E7520', color: '#1D9E75', fontSize: '10px', fontWeight: 700,
+                      padding: '3px 8px', borderRadius: '12px', border: '1px solid #1D9E7540',
+                    }}>
+                      {ci.activeBadge}
+                    </span>
+                  )}
                 </div>
-                <h2 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 4px', color: 'var(--pe-text-main)' }}>
+                <h2 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 4px', color: isPro ? '#fff' : 'var(--pe-text-main)' }}>
                   {tool.title}
                 </h2>
-                <p style={{ fontSize: '11px', color: 'var(--pe-text-hint)', margin: '0 0 12px', fontStyle: 'italic' }}>
+                <p style={{ fontSize: '11px', color: isPro ? 'rgba(255,255,255,0.8)' : 'var(--pe-text-hint)', margin: '0 0 12px', fontStyle: 'italic' }}>
                   {tool.titleEn}
                 </p>
-                <p style={{ fontSize: '13px', color: 'var(--pe-text-muted)', margin: '0 0 16px', lineHeight: 1.6, flex: 1 }}>
+                <p style={{ fontSize: '13px', color: isPro ? 'rgba(255,255,255,0.9)' : 'var(--pe-text-muted)', margin: '0 0 16px', lineHeight: 1.6, flex: 1 }}>
                   {tool.desc}
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
                   {tool.tags.map(tag => (
                     <span key={tag} style={{
-                      background: 'var(--pe-green-light)', color: 'var(--pe-green-dark)',
+                      background: isPro ? 'rgba(255,255,255,0.2)' : 'var(--pe-green-light)',
+                      color: isPro ? '#fff' : 'var(--pe-green-dark)',
                       fontSize: '10px', fontWeight: 600, padding: '2px 8px', borderRadius: '10px',
                     }}>
                       {tag}
                     </span>
                   ))}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--pe-green)', fontSize: '13px', fontWeight: 600 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: isPro ? '#fff' : 'var(--pe-green)', fontSize: '13px', fontWeight: 600 }}>
                   {ci.useNow}
                 </div>
               </div>
