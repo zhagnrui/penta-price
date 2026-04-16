@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { isValidLocale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/getDictionary'
 import IFRCalc from '@/components/IFRCalc'
-import IFRBatchCalc from '@/components/IFRBatchCalc'
+import IFRBatchCalcV2 from '@/components/IFRBatchCalcV2'
 
 const SITE_URL = 'https://www.pentaprice.com'
 
@@ -119,7 +119,7 @@ export default async function IFRPage({ params }: Props) {
         </p>
       </div>
 
-      <IFRBatchCalc />
+      <IFRBatchCalcV2 />
     </main>
   )
 }
