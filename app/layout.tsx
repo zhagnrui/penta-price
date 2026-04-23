@@ -53,7 +53,11 @@ export const metadata: Metadata = {
   },
 }
 
-// Root layout: minimal shell — the [lang] layout handles html/body/footer
+// Root layout: provides html/body structure for all pages
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return children
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  )
 }

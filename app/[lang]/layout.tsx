@@ -87,40 +87,38 @@ export default async function LangLayout({ children, params }: Props) {
   }
 
   return (
-    <html lang={htmlLang}>
+    <>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaOrg) }}
         />
       </head>
-      <body>
-        {/* Language switcher — top-right */}
-        <div className="pe-lang-bar">
-          <LanguageSwitcher current={lang as Locale} />
-        </div>
+      {/* Language switcher — top-right */}
+      <div className="pe-lang-bar">
+        <LanguageSwitcher current={lang as Locale} />
+      </div>
 
-        {children}
+      {children}
 
-        <footer className="pe-footer">
-          <div className="pe-footer-inner">
-            <div className="pe-footer-brand">
-              <span className="pe-footer-logo">{dict.footer.brand}</span>
-              <span className="pe-footer-tagline">{dict.footer.tagline}</span>
-            </div>
-            <div className="pe-footer-contact">
-              <a href="mailto:ryan139@gmail.com" className="pe-footer-email">
-                📧 ryan139@gmail.com
-              </a>
-              <span className="pe-footer-note">{dict.footer.inquiries}</span>
-            </div>
-            <div className="pe-footer-copy">
-              <span>© {new Date().getFullYear()} PentaPrice. {dict.footer.refOnly}</span>
-              <span>{dict.footer.updated}</span>
-            </div>
+      <footer className="pe-footer">
+        <div className="pe-footer-inner">
+          <div className="pe-footer-brand">
+            <span className="pe-footer-logo">{dict.footer.brand}</span>
+            <span className="pe-footer-tagline">{dict.footer.tagline}</span>
           </div>
-        </footer>
-      </body>
-    </html>
+          <div className="pe-footer-contact">
+            <a href="mailto:ryan139@gmail.com" className="pe-footer-email">
+              📧 ryan139@gmail.com
+            </a>
+            <span className="pe-footer-note">{dict.footer.inquiries}</span>
+          </div>
+          <div className="pe-footer-copy">
+            <span>© {new Date().getFullYear()} PentaPrice. {dict.footer.refOnly}</span>
+            <span>{dict.footer.updated}</span>
+          </div>
+        </div>
+      </footer>
+    </>
   )
 }
