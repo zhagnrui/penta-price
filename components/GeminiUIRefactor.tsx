@@ -3,17 +3,19 @@
 import { useState, useMemo } from 'react'
 
 /**
- * Gemini版本UI改造 v2.0 — Phase 2: 集成真实计算逻辑
+ * Gemini版本UI改造 v3.0 — Phase 3: 性能预测集成
  *
  * 架构：
  * ┌─ 左侧输入面板（原料配置：kg + 价格）
  * │
  * ├─ 右侧成本仪表板（动态计算）
  * │  ├─ 成本总数 + 成本分解图
+ * │  ├─ 化学计量分析（P/OH, P:N, P%, N%）
+ * │  ├─ 性能预测（LOI, PHRR, THRF + 炭层评分）
  * │  ├─ 技术影响卡片（从化学计量推导）
  * │  └─ 优化建议（动态生成）
  * │
- * └─ 底部：成本-技术决策矩阵 + SOP清单
+ * └─ 底部：成本档位矩阵 + SOP清单
  */
 
 // ── 分子量常数 ──────────────────────────────────────────────
@@ -23,6 +25,72 @@ const MW = { P2O5: 141.94, KOH: 56.11, P: 30.97, N: 14.01 }
 const MARKET_REF = {
   per95: 10.25,   // ¥/kg (95%, ¥10,000–10,500/t avg)
   per98: 13.75,   // ¥/kg (98%, ¥13,500–14,000/t avg)
+}
+
+// ────────────────────────────────────────────────────────────
+// 性能预测模型（与 IFRBatchCalcV2 一致，基于论文数据）
+// ────────────────────────────────────────────────────────────
+
+/**
+ * LOI 预测 — Schartel et al. (2003)
+ * LOI ≈ 20 + 0.5 × wt%P   (linear, P range 8–22%)
+ */
+function predictLOI(pct_P: number) {
+  const loi = 20.0 + 0.5 * pct_P
+  const level =
+    loi < 24 ? 'poor' :
+    loi < 27 ? 'acceptable' :
+    loi < 30 ? 'good' : 'excellent'
+  return { value: Math.round(loi * 10) / 10, min: Math.max(20, loi - 2), max: loi + 2, level }
+}
+
+/**
+ * PHRR 预测 — Zhenglai et al. (2010)
+ * Baseline 850 kW/m²；P%和P:N共同影响降低幅度
+ */
+function predictPHRR(pct_P: number, ratio_PN: number, ifrLoading = 40) {
+  const baseline = 850
+  const p_factor  = 1.0 - (pct_P - 10) / 100
+  let pn_factor = 1.0
+  if      (ratio_PN < 1.5) pn_factor = 1.0 + (1.5 - ratio_PN) * 0.30
+  else if (ratio_PN > 2.5) pn_factor = 1.0 + (ratio_PN - 2.5) * 0.25
+  const ifr_factor = 0.5 + 0.5 * Math.pow(ifrLoading / 100, 0.6)
+  const phrr = baseline * p_factor * pn_factor * ifr_factor
+  return { value: Math.round(phrr), min: Math.round(phrr * 0.85), max: Math.round(phrr * 1.15) }
+}
+
+/**
+ * THRF 隔热时间预测 — Schartel & Braun (2007)
+ * 基线 150s；P/OH 0.5–1.2 最佳，膨胀倍率和P%调节
+ */
+function predictTHRF(ratio_POH: number, pct_N: number, pct_P: number) {
+  // 膨胀倍率估算（来自N%分段）
+  const exp_mid = pct_N < 6 ? 8.5 : pct_N < 9 ? 16 : pct_N < 12 ? 26 : pct_N < 15 ? 36.5 : 50
+  const baseline = 150
+  let poh_factor = ratio_POH < 0.5 ? 0.7 + ratio_POH * 0.6
+                 : ratio_POH > 1.2 ? 1.3 - (ratio_POH - 1.2) * 0.4 : 1.2
+  const exp_factor = Math.max(0.8, 1.0 - (exp_mid - 20) / 200)
+  const p_factor   = 0.9 + (pct_P - 15) / 70
+  const thrf = baseline * poh_factor * exp_factor * p_factor
+  return { value: Math.round(thrf), min: Math.round(thrf * 0.80), max: Math.round(thrf * 1.20), exp_mid }
+}
+
+/** 炭层综合质量评分 (0–100) */
+function charScore(ratio_POH: number, ratio_PN: number, pct_P: number, pct_N: number): number {
+  let s = 0
+  if (ratio_POH >= 0.5 && ratio_POH <= 1.2)   s += 25
+  else if (ratio_POH >= 0.4 && ratio_POH <= 1.3) s += 18
+  else s += 8
+  if (ratio_PN >= 1.5 && ratio_PN <= 2.5)     s += 25
+  else if (ratio_PN >= 1.3 && ratio_PN <= 2.7) s += 18
+  else s += 8
+  if (pct_P >= 15 && pct_P <= 22) s += 25
+  else if (pct_P >= 13 && pct_P <= 23) s += 18
+  else s += 8
+  if (pct_N >= 8 && pct_N <= 13) s += 25
+  else if (pct_N >= 6 && pct_N <= 15)  s += 18
+  else s += 8
+  return s
 }
 
 // ────────────────────────────────────────────────────────────
@@ -230,6 +298,79 @@ function StoichBadge({ label, value, unit, min, max }: {
 }
 
 // ────────────────────────────────────────────────────────────
+// 性能预测面板
+// ────────────────────────────────────────────────────────────
+
+interface PerfData {
+  loi:   ReturnType<typeof predictLOI>
+  phrr:  ReturnType<typeof predictPHRR>
+  thrf:  ReturnType<typeof predictTHRF>
+  score: number
+}
+
+function PerformancePrediction({ perf, unitCost }: { perf: PerfData; unitCost: number }) {
+  const loiColor   = perf.loi.level === 'poor' ? 'text-red-700' : perf.loi.level === 'excellent' ? 'text-green-700' : 'text-blue-700'
+  const loiLabel   = { poor: '⚠️ 偏弱', acceptable: '✓ 可接受', good: '✓ 良好', excellent: '✓✓ 优秀' }[perf.loi.level]
+  const scoreColor = perf.score >= 85 ? 'text-green-700' : perf.score >= 65 ? 'text-amber-700' : 'text-red-700'
+  const scoreLabel = perf.score >= 95 ? 'A+ 完美' : perf.score >= 85 ? 'A 优秀' : perf.score >= 70 ? 'B 良好' : perf.score >= 50 ? 'C 需改进' : 'D 不合格'
+
+  return (
+    <div className="bg-gradient-to-br from-blue-50 to-sky-50 rounded-lg p-5 mb-5 border border-blue-200">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-semibold text-blue-900">
+          🎯 性能预测 Performance Prediction
+        </h3>
+        <div className="text-xs text-blue-500">基于论文经验公式 | Schartel (2003, 2007); Zhenglai (2010)</div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        {/* LOI */}
+        <div className="bg-white rounded-lg p-3 border border-blue-100 text-center">
+          <div className="text-xs font-semibold text-blue-600 mb-1">极限氧指数 LOI</div>
+          <div className={`text-3xl font-black tabular-nums ${loiColor}`}>{perf.loi.value}</div>
+          <div className="text-xs text-slate-400 mb-1">范围 {perf.loi.min.toFixed(1)}–{perf.loi.max.toFixed(1)}</div>
+          <div className={`text-xs font-medium ${loiColor}`}>{loiLabel}</div>
+        </div>
+
+        {/* PHRR */}
+        <div className="bg-white rounded-lg p-3 border border-red-100 text-center">
+          <div className="text-xs font-semibold text-red-600 mb-1">热释放速率 PHRR</div>
+          <div className="text-3xl font-black tabular-nums text-red-700">{perf.phrr.value}</div>
+          <div className="text-xs text-slate-400 mb-1">kW/m² ({perf.phrr.min}–{perf.phrr.max})</div>
+          <div className="text-xs font-medium text-red-600">越低越好</div>
+        </div>
+
+        {/* THRF */}
+        <div className="bg-white rounded-lg p-3 border border-teal-100 text-center">
+          <div className="text-xs font-semibold text-teal-600 mb-1">隔热时间 THRF</div>
+          <div className="text-3xl font-black tabular-nums text-teal-700">{perf.thrf.value}</div>
+          <div className="text-xs text-slate-400 mb-1">秒 ({perf.thrf.min}–{perf.thrf.max}s)</div>
+          <div className="text-xs font-medium text-teal-600">膨胀倍率≈{perf.thrf.exp_mid.toFixed(0)}×</div>
+        </div>
+      </div>
+
+      {/* 炭层评分 + 成本效能比 */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-white rounded-lg px-4 py-3 border border-blue-100 flex items-center gap-3">
+          <div>
+            <div className="text-xs text-slate-500 mb-0.5">炭层综合评分</div>
+            <div className={`text-2xl font-black tabular-nums ${scoreColor}`}>{perf.score}<span className="text-sm font-normal">/100</span></div>
+          </div>
+          <div className={`text-lg font-bold ${scoreColor}`}>{scoreLabel}</div>
+        </div>
+        <div className="bg-white rounded-lg px-4 py-3 border border-blue-100">
+          <div className="text-xs text-slate-500 mb-0.5">性能/成本比（LOI/成本）</div>
+          <div className="text-2xl font-black text-slate-700 tabular-nums">
+            {unitCost > 0 ? (perf.loi.value / (unitCost / 1000)).toFixed(2) : '—'}
+          </div>
+          <div className="text-xs text-slate-400">LOI点数 / 千元·吨 · 越高越经济</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ────────────────────────────────────────────────────────────
 // 价格输入字段（简化版）
 // ────────────────────────────────────────────────────────────
 
@@ -316,6 +457,17 @@ export default function GeminiUIRefactor() {
   const unit_cost = stoich && stoich.total_ifr > 0
     ? (total_cost / stoich.total_ifr) * 1000
     : 0
+
+  // ── 性能预测 ─────────────────────────────────────────────
+  const performance = useMemo<PerfData | null>(() => {
+    if (!stoich) return null
+    return {
+      loi:   predictLOI(stoich.pct_P),
+      phrr:  predictPHRR(stoich.pct_P, stoich.ratio_PN),
+      thrf:  predictTHRF(stoich.ratio_POH, stoich.pct_N, stoich.pct_P),
+      score: charScore(stoich.ratio_POH, stoich.ratio_PN, stoich.pct_P, stoich.pct_N),
+    }
+  }, [stoich])
 
   // ── 成本分解数据 ─────────────────────────────────────────
   const costBreakdown = useMemo<CostBreakdownItem[]>(() => {
@@ -599,6 +751,11 @@ export default function GeminiUIRefactor() {
                   <StoichBadge label="N 含量" value={stoich.pct_N} unit="%" min={8} max={13} />
                 </div>
               </div>
+            )}
+
+            {/* 性能预测面板 */}
+            {performance && (
+              <PerformancePrediction perf={performance} unitCost={unit_cost} />
             )}
 
             {/* 技术影响卡片 */}
