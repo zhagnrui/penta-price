@@ -4,7 +4,16 @@ import { currentWeek } from '@/lib/priceData'
 
 const SITE_URL = 'https://www.pentaprice.com'
 
-const PAGES = ['', '/calculator', '/calculator/lubricant', '/calculator/antioxidant', '/calculator/alkyd']
+const PAGES = [
+  '',
+  '/calculator',
+  '/calculator/lubricant',
+  '/calculator/antioxidant',
+  '/calculator/alkyd',
+  '/calculator/ifr',
+  '/calculator/ifr-pro',
+  '/calculator/ifr-cost',
+]
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = []

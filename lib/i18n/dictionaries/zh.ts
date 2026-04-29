@@ -203,6 +203,12 @@ const zh = {
         desc: '专业级性能预测与工艺分析：基于COA数据进行化学计量分析，预测LOI/PHRR/THRF性能指标，评估5大工艺风险，引用16+学术论文支持。适合工程设计、专利申请、批次对标。',
         tags: ['防火涂料Pro', '性能预测', '学术计算', 'LOI PHRR THRF', '工艺风险'],
       },
+      ifrCost: {
+        title: 'IFR成本优化仪表板',
+        titleEn: 'Cost-Driven Formulation Dashboard',
+        desc: '输入APP/PER/MEL用量与采购单价，实时计算成本分解、化学计量分析和性能预测（LOI/PHRR/THRF）。动态生成技术影响卡片与优化建议，帮助采购与技术团队共同决策最优配方。',
+        tags: ['成本优化', 'LOI预测', '配方决策', 'APP PER MEL', '性价比分析'],
+      },
     },
   },
 

@@ -194,6 +194,12 @@ const de: Dictionary = {
         desc: 'Professionelle Formulierungsoptimierung: Stöchiometrische Analyse von Zertifikatsdaten, LOI/PHRR/THRF-Leistungsprognose, Prozessrisikobewertung über 5 Module, 16+ akademische Papierverweis. Ideal für Ingenieur-Dokumentation, Patentanwendungen und Chargen-Benchmarking.',
         tags: ['Brandschutz Pro', 'Leistungsvorhersage', 'Akademische Unterstützung', 'LOI PHRR THRF', 'Risikobewertung'],
       },
+      ifrCost: {
+        title: 'IFR Kostenoptimierungs-Dashboard',
+        titleEn: 'Kostenorientiertes Formulierungs-Dashboard',
+        desc: 'APP/PER/MEL-Mengen und Einkaufspreise eingeben — sofortige Kostenaufschlüsselung, stöchiometrische Analyse und Leistungsvorhersagen (LOI/PHRR/THRF). Dynamische Karten für technische Auswirkungen und Optimierungsvorschläge helfen Einkauf und Technik gemeinsam zu entscheiden.',
+        tags: ['Kostenoptimierung', 'LOI-Vorhersage', 'Formulierungsentscheidung', 'APP PER MEL', 'Wertanalyse'],
+      },
     },
   },
 

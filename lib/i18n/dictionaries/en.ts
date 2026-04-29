@@ -194,6 +194,12 @@ const en: Dictionary = {
         desc: 'Enterprise-grade formulation optimization: stoichiometric analysis from COA data, LOI/PHRR/THRF performance forecasting, process risk assessment across 5 modules, 16+ academic paper citations. Ideal for engineering documentation, patent applications, and batch benchmarking.',
         tags: ['Fire retardant Pro', 'Performance prediction', 'Academic support', 'LOI PHRR THRF', 'Risk assessment'],
       },
+      ifrCost: {
+        title: 'IFR Cost Optimization Dashboard',
+        titleEn: 'Cost-Driven Formulation Dashboard',
+        desc: 'Enter APP/PER/MEL quantities and unit prices to get real-time cost breakdown, stoichiometric analysis, and performance predictions (LOI/PHRR/THRF). Dynamically generated tech implication cards and optimization suggestions help procurement and engineering teams make joint formulation decisions.',
+        tags: ['Cost optimization', 'LOI prediction', 'Formulation decision', 'APP PER MEL', 'Value analysis'],
+      },
     },
   },
 

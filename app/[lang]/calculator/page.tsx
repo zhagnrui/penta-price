@@ -28,13 +28,36 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-const TOOL_KEYS = ['lubricant', 'antioxidant', 'alkyd', 'ifr', 'ifrPro'] as const
+const TOOL_KEYS = ['lubricant', 'antioxidant', 'alkyd', 'ifr', 'ifrPro', 'ifrCost'] as const
+
+// URL slugs (camelCase keys → kebab-case paths where needed)
+const TOOL_HREFS: Record<string, string> = {
+  lubricant:   'lubricant',
+  antioxidant: 'antioxidant',
+  alkyd:       'alkyd',
+  ifr:         'ifr',
+  ifrPro:      'ifr-pro',
+  ifrCost:     'ifr-cost',
+}
+
 const TOOL_ICONS: Record<string, string> = {
   lubricant:   '🛢️',
   antioxidant: '🧪',
   alkyd:       '🎨',
   ifr:         '🔥',
   ifrPro:      '🔬',
+  ifrCost:     '📊',
+}
+
+// Card style variants
+type CardVariant = 'default' | 'pro' | 'cost'
+const TOOL_VARIANT: Record<string, CardVariant> = {
+  lubricant:   'default',
+  antioxidant: 'default',
+  alkyd:       'default',
+  ifr:         'default',
+  ifrPro:      'pro',
+  ifrCost:     'cost',
 }
 
 export default async function CalculatorIndexPage({ params }: Props) {
@@ -80,13 +103,23 @@ export default async function CalculatorIndexPage({ params }: Props) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
         {TOOL_KEYS.map(key => {
           const tool = ci.tools[key]
-          const isPro = key === 'ifrPro'
+          const variant = TOOL_VARIANT[key]
+          const href = `/${lang}/calculator/${TOOL_HREFS[key]}`
+
+          const isPro  = variant === 'pro'
+          const isCost = variant === 'cost'
+          const isSpecial = isPro || isCost
+
+          const specialStyle = isPro
+            ? { background: 'linear-gradient(135deg, #0F6E56, #1D9E75)' }
+            : { background: 'linear-gradient(135deg, #92400e, #b45309)' }   // amber for cost
+
           return (
-            <Link key={key} href={`/${lang}/calculator/${key}`} style={{ textDecoration: 'none', display: 'block' }}>
+            <Link key={key} href={href} style={{ textDecoration: 'none', display: 'block' }}>
               <div
-                className={isPro ? '' : 'pe-card pe-calc-tool-card'}
-                style={isPro ? {
-                  background: 'linear-gradient(135deg, #0F6E56, #1D9E75)',
+                className={isSpecial ? '' : 'pe-card pe-calc-tool-card'}
+                style={isSpecial ? {
+                  ...specialStyle,
                   borderRadius: 'var(--radius-lg)',
                   padding: '1.25rem',
                   color: '#fff',
@@ -99,13 +132,11 @@ export default async function CalculatorIndexPage({ params }: Props) {
                   transition: 'transform 0.2s, box-shadow 0.2s',
                 } : {}}
               >
-                {isPro && (
+                {/* decorative circle */}
+                {isSpecial && (
                   <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    width: '100px',
-                    height: '100px',
+                    position: 'absolute', top: 0, right: 0,
+                    width: '100px', height: '100px',
                     background: 'rgba(255,255,255,0.05)',
                     borderRadius: '50%',
                     transform: 'translate(30%, -30%)',
@@ -122,6 +153,14 @@ export default async function CalculatorIndexPage({ params }: Props) {
                     }}>
                       ⭐ Pro
                     </span>
+                  ) : isCost ? (
+                    <span style={{
+                      background: 'rgba(255,255,255,0.25)', color: '#fff', fontSize: '10px', fontWeight: 700,
+                      padding: '4px 10px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.4)',
+                      backdropFilter: 'blur(6px)',
+                    }}>
+                      💰 成本版
+                    </span>
                   ) : (
                     <span style={{
                       background: '#1D9E7520', color: '#1D9E75', fontSize: '10px', fontWeight: 700,
@@ -131,27 +170,28 @@ export default async function CalculatorIndexPage({ params }: Props) {
                     </span>
                   )}
                 </div>
-                <h2 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 4px', color: isPro ? '#fff' : 'var(--pe-text-main)' }}>
+
+                <h2 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 4px', color: isSpecial ? '#fff' : 'var(--pe-text-main)' }}>
                   {tool.title}
                 </h2>
-                <p style={{ fontSize: '11px', color: isPro ? 'rgba(255,255,255,0.8)' : 'var(--pe-text-hint)', margin: '0 0 12px', fontStyle: 'italic' }}>
+                <p style={{ fontSize: '11px', color: isSpecial ? 'rgba(255,255,255,0.8)' : 'var(--pe-text-hint)', margin: '0 0 12px', fontStyle: 'italic' }}>
                   {tool.titleEn}
                 </p>
-                <p style={{ fontSize: '13px', color: isPro ? 'rgba(255,255,255,0.9)' : 'var(--pe-text-muted)', margin: '0 0 16px', lineHeight: 1.6, flex: 1 }}>
+                <p style={{ fontSize: '13px', color: isSpecial ? 'rgba(255,255,255,0.9)' : 'var(--pe-text-muted)', margin: '0 0 16px', lineHeight: 1.6, flex: 1 }}>
                   {tool.desc}
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
                   {tool.tags.map(tag => (
                     <span key={tag} style={{
-                      background: isPro ? 'rgba(255,255,255,0.2)' : 'var(--pe-green-light)',
-                      color: isPro ? '#fff' : 'var(--pe-green-dark)',
+                      background: isSpecial ? 'rgba(255,255,255,0.2)' : 'var(--pe-green-light)',
+                      color: isSpecial ? '#fff' : 'var(--pe-green-dark)',
                       fontSize: '10px', fontWeight: 600, padding: '2px 8px', borderRadius: '10px',
                     }}>
                       {tag}
                     </span>
                   ))}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: isPro ? '#fff' : 'var(--pe-green)', fontSize: '13px', fontWeight: 600 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: isSpecial ? '#fff' : 'var(--pe-green)', fontSize: '13px', fontWeight: 600 }}>
                   {ci.useNow}
                 </div>
               </div>

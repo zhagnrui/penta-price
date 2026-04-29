@@ -412,7 +412,7 @@ function PriceField({
 // 主仪表板组件
 // ────────────────────────────────────────────────────────────
 
-export default function GeminiUIRefactor() {
+export default function GeminiUIRefactor({ lang }: { lang?: string }) {
   // ── 原料用量 ────────────────────────────────────────────
   const [app_kg,    set_app_kg]    = useState(63.6)
   const [app_p2o5,  set_app_p2o5]  = useState(71.0)
@@ -655,6 +655,18 @@ export default function GeminiUIRefactor() {
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
+
+        {/* 返回链接 */}
+        {lang && (
+          <div className="mb-4">
+            <a
+              href={`/${lang}/calculator`}
+              style={{ color: 'var(--pe-green)', textDecoration: 'none', fontSize: '13px', fontWeight: 600 }}
+            >
+              ← 返回计算工具 / Back to calculators
+            </a>
+          </div>
+        )}
 
         {/* 标题栏 */}
         <div className="mb-6 flex items-start justify-between gap-4">

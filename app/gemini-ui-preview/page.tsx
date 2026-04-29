@@ -1,14 +1,6 @@
-import GeminiUIRefactor from '@/components/GeminiUIRefactor'
+import { redirect } from 'next/navigation'
 
-export const metadata = {
-  title: 'Gemini UI 改造预览 | PentaPrice',
-  description: '成本驱动的仪表板UI改造',
-}
-
-export default function GeminiPreviewPage() {
-  return (
-    <>
-      <GeminiUIRefactor />
-    </>
-  )
+// Dev preview route retired — tool now lives at /[lang]/calculator/ifr-cost
+export default function GeminiPreviewRedirect() {
+  redirect('/zh/calculator/ifr-cost')
 }
